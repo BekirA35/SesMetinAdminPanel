@@ -1,11 +1,11 @@
 {
-    "name": "sesmetinadminpanel",
-    "short_name": "sesmetinadminpanel",
+    "name": "SesMetin Admin Panel",
+    "short_name": "SesMetin Admin",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0F172A",
+    "theme_color": "#6366F1",
+    "description": "SesMetin Admin Panel - Ses kayıtlarını metne çevirme yönetim paneli",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
