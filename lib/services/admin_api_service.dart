@@ -5,7 +5,9 @@ import '../models/admin_user.dart';
 import '../models/admin_record.dart';
 import '../models/activity.dart';
 import '../models/chart_data.dart';
+import '../models/admin_login.dart';
 import 'mock_data_service.dart';
+import 'auth_service.dart';
 
 class AdminApiService {
   // Development URL - ngrok üzerinden
@@ -13,17 +15,55 @@ class AdminApiService {
       'https://seignorial-overboastfully-september.ngrok-free.dev';
 
   // Ngrok için özel header ekleyerek bypass yapıyoruz
-  Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      };
+  Future<Map<String, String>> get _headers async {
+    final headers = {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+    };
+    
+    // Token varsa header'a ekle
+    final token = await AuthService.getToken();
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    
+    return headers;
+  }
+
+  // Admin Login
+  Future<AdminLoginResponse> adminLogin(String username, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/Admin/login'),
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode(AdminLoginRequest(
+          username: username,
+          password: password,
+        ).toJson()),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return AdminLoginResponse.fromJson(jsonDecode(response.body));
+      } else if (response.statusCode == 401 || response.statusCode == 400) {
+        final error = AdminLoginResponse.fromJson(jsonDecode(response.body));
+        return error;
+      } else {
+        throw Exception('API Hatası: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Bağlantı hatası: $e');
+    }
+  }
 
   // Dashboard istatistikleri
   Future<StatsResponse> getStats() async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Admin/stats'),
-        headers: _headers,
+        headers: await _headers,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
@@ -43,7 +83,7 @@ class AdminApiService {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Admin/users'),
-        headers: _headers,
+        headers: await _headers,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
@@ -63,7 +103,7 @@ class AdminApiService {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Admin/users/$userId/records'),
-        headers: _headers,
+        headers: await _headers,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
@@ -86,7 +126,7 @@ class AdminApiService {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Admin/activities?limit=$limit'),
-        headers: _headers,
+        headers: await _headers,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
@@ -106,7 +146,7 @@ class AdminApiService {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/Admin/chart?days=$days'),
-        headers: _headers,
+        headers: await _headers,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {

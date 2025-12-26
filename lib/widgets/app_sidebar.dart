@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
+import '../services/auth_service.dart';
 
 class AppSidebar extends StatefulWidget {
   final String currentPath;
@@ -153,29 +154,41 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildBottomSection() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.cardColor.withAlpha(77),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Center(
-        child: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.successColor, AppTheme.accentColor],
+    return Column(
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () async {
+              await AuthService.logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Tooltip(
+              message: 'Çıkış Yap',
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.errorColor.withAlpha(38),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.logout_rounded,
+                      size: 22,
+                      color: AppTheme.errorColor,
+                    ),
+                  ),
+                ),
+              ),
             ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Icon(
-            Icons.person_rounded,
-            color: Colors.white,
-            size: 18,
           ),
         ),
-      ),
+      ],
     );
   }
 }

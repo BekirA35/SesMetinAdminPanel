@@ -12,17 +12,17 @@ class MockDataService {
       success: true,
       message: 'Mock veriler gösteriliyor',
       stats: DashboardStats(
-        totalUsers: 1247,
-        totalRecords: 8934,
-        totalShares: 342,
-        activeShares: 89,
-        totalTranslations: 15678,
-        todayNewUsers: 12,
-        todayNewRecords: 87,
-        thisWeekNewUsers: 78,
-        thisWeekNewRecords: 523,
+        totalUsers: 25,
+        totalRecords: 180,
+        totalShares: 15,
+        activeShares: 1,
+        totalTranslations: 1453,
+        todayNewUsers: 2,
+        todayNewRecords: 8,
+        thisWeekNewUsers: 5,
+        thisWeekNewRecords: 25,
         averageRecordsPerUser: 7.2,
-        totalShareAccessCount: 2341,
+        totalShareAccessCount: 45,
       ),
     );
   }
@@ -30,11 +30,26 @@ class MockDataService {
   // Kullanıcı listesi için mock data
   static UsersResponse getMockUsers() {
     final now = DateTime.now();
-    final users = List.generate(15, (index) {
+    
+    // Gerçek Türkçe isimler ve email adresleri
+    final userData = [
+      {'name': 'Ahmet Yılmaz', 'email': 'ahmet.yilmaz@gmail.com'},
+      {'name': 'Ayşe Demir', 'email': 'ayse.demir@hotmail.com'},
+      {'name': 'Mehmet Kaya', 'email': 'mehmet.kaya@outlook.com'},
+      {'name': 'Fatma Şahin', 'email': 'fatma.sahin@yahoo.com'},
+      {'name': 'Ali Çelik', 'email': 'ali.celik@gmail.com'},
+      {'name': 'Zeynep Arslan', 'email': 'zeynep.arslan@hotmail.com'},
+      {'name': 'Mustafa Öztürk', 'email': 'mustafa.ozturk@gmail.com'},
+      {'name': 'Elif Yıldız', 'email': 'elif.yildiz@outlook.com'},
+      {'name': 'Emre Aydın', 'email': 'emre.aydin@yahoo.com'},
+      {'name': 'Selin Koç', 'email': 'selin.koc@gmail.com'},
+    ];
+
+    final users = List.generate(10, (index) {
       return AdminUser(
         id: index + 1,
-        username: 'Kullanıcı${index + 1}',
-        email: 'kullanici${index + 1}@example.com',
+        username: userData[index]['name']!,
+        email: userData[index]['email']!,
         createdAt: now.subtract(Duration(days: (index * 3) + 1)),
         recordCount: (index + 1) * 3 + 5,
         shareCount: (index + 1) * 2,
@@ -53,10 +68,26 @@ class MockDataService {
   // Kullanıcı kayıtları için mock data
   static UserRecordsResponse getMockUserRecords(int userId) {
     final now = DateTime.now();
+    
+    // Gerçek Türkçe isimler ve email adresleri
+    final userData = [
+      {'name': 'Ahmet Yılmaz', 'email': 'ahmet.yilmaz@gmail.com'},
+      {'name': 'Ayşe Demir', 'email': 'ayse.demir@hotmail.com'},
+      {'name': 'Mehmet Kaya', 'email': 'mehmet.kaya@outlook.com'},
+      {'name': 'Fatma Şahin', 'email': 'fatma.sahin@yahoo.com'},
+      {'name': 'Ali Çelik', 'email': 'ali.celik@gmail.com'},
+      {'name': 'Zeynep Arslan', 'email': 'zeynep.arslan@hotmail.com'},
+      {'name': 'Mustafa Öztürk', 'email': 'mustafa.ozturk@gmail.com'},
+      {'name': 'Elif Yıldız', 'email': 'elif.yildiz@outlook.com'},
+      {'name': 'Emre Aydın', 'email': 'emre.aydin@yahoo.com'},
+      {'name': 'Selin Koç', 'email': 'selin.koc@gmail.com'},
+    ];
+    
+    final userIndex = (userId - 1).clamp(0, userData.length - 1);
     final user = AdminUser(
       id: userId,
-      username: 'Kullanıcı$userId',
-      email: 'kullanici$userId@example.com',
+      username: userData[userIndex]['name']!,
+      email: userData[userIndex]['email']!,
       createdAt: now.subtract(const Duration(days: 30)),
       recordCount: 8,
       shareCount: 3,
@@ -109,21 +140,36 @@ class MockDataService {
         String description;
         String? username;
 
+        // Gerçek Türkçe isimler
+        final realNames = [
+          'Ahmet Yılmaz',
+          'Ayşe Demir',
+          'Mehmet Kaya',
+          'Fatma Şahin',
+          'Ali Çelik',
+          'Zeynep Arslan',
+          'Mustafa Öztürk',
+          'Elif Yıldız',
+          'Emre Aydın',
+          'Selin Koç',
+        ];
+        
         switch (activityType) {
           case 'user_registered':
             description = 'Yeni kullanıcı kaydı oluşturuldu';
-            username = 'Kullanıcı${activities.length + 1}';
+            username = realNames[activities.length % realNames.length];
             break;
           case 'record_created':
             description = 'Yeni kayıt oluşturuldu';
-            username = 'Kullanıcı${(activities.length % 5) + 1}';
+            username = realNames[(activities.length % realNames.length)];
             break;
           case 'share_created':
             description = 'Yeni paylaşım oluşturuldu';
-            username = 'Kullanıcı${(activities.length % 5) + 1}';
+            username = realNames[(activities.length % realNames.length)];
             break;
           default:
             description = 'Yeni aktivite';
+            username = realNames[activities.length % realNames.length];
         }
 
         activities.add(Activity(

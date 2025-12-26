@@ -6,10 +6,43 @@ import '../pages/dashboard_page.dart';
 import '../pages/users_page.dart';
 import '../pages/user_detail_page.dart';
 import '../pages/activities_page.dart';
+import '../pages/admin_login_page.dart';
+import '../services/auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  redirect: (context, state) async {
+    final isLoggedIn = await AuthService.isLoggedIn();
+    final isLoginPage = state.uri.path == '/login';
+
+    // Login sayfasındaysa ve zaten giriş yapmışsa, dashboard'a yönlendir
+    if (isLoginPage && isLoggedIn) {
+      return '/';
+    }
+
+    // Login sayfası değilse ve giriş yapılmamışsa, login'e yönlendir
+    if (!isLoginPage && !isLoggedIn) {
+      return '/login';
+    }
+
+    return null; // Yönlendirme yok
+  },
   routes: [
+    // Login sayfası (ShellRoute dışında)
+    GoRoute(
+      path: '/login',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const AdminLoginPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SafeFadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    ),
+    // Ana uygulama (ShellRoute içinde - login kontrolü yapılıyor)
     ShellRoute(
       builder: (context, state, child) {
         return AppShell(
