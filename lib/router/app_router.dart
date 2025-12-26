@@ -7,26 +7,9 @@ import '../pages/users_page.dart';
 import '../pages/user_detail_page.dart';
 import '../pages/activities_page.dart';
 import '../pages/admin_login_page.dart';
-import '../services/auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
-  redirect: (context, state) async {
-    final isLoggedIn = await AuthService.isLoggedIn();
-    final isLoginPage = state.uri.path == '/login';
-
-    // Login sayfasındaysa ve zaten giriş yapmışsa, dashboard'a yönlendir
-    if (isLoginPage && isLoggedIn) {
-      return '/';
-    }
-
-    // Login sayfası değilse ve giriş yapılmamışsa, login'e yönlendir
-    if (!isLoginPage && !isLoggedIn) {
-      return '/login';
-    }
-
-    return null; // Yönlendirme yok
-  },
+  initialLocation: '/login',
   routes: [
     // Login sayfası (ShellRoute dışında)
     GoRoute(
