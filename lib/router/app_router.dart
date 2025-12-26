@@ -7,9 +7,23 @@ import '../pages/users_page.dart';
 import '../pages/user_detail_page.dart';
 import '../pages/activities_page.dart';
 import '../pages/admin_login_page.dart';
+import '../services/auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/login',
+  redirect: (context, state) async {
+    final isLoginPage = state.uri.path == '/login';
+    
+    // Login sayfası değilse ve giriş yapılmamışsa, login'e yönlendir
+    if (!isLoginPage) {
+      final isLoggedIn = await AuthService.isLoggedIn();
+      if (!isLoggedIn) {
+        return '/login';
+      }
+    }
+    
+    return null; // Yönlendirme yok
+  },
   routes: [
     // Login sayfası (ShellRoute dışında)
     GoRoute(
@@ -32,6 +46,14 @@ final GoRouter appRouter = GoRouter(
           currentPath: state.uri.path,
           child: child,
         );
+      },
+      redirect: (context, state) async {
+        // ShellRoute içindeki tüm sayfalar için login kontrolü
+        final isLoggedIn = await AuthService.isLoggedIn();
+        if (!isLoggedIn) {
+          return '/login';
+        }
+        return null;
       },
       routes: [
         GoRoute(
@@ -132,9 +154,9 @@ final GoRouter appRouter = GoRouter(
           ),
           const SizedBox(height: 32),
           ElevatedButton.icon(
-            onPressed: () => context.go('/'),
-            icon: const Icon(Icons.home_rounded),
-            label: const Text('Ana Sayfaya Dön'),
+            onPressed: () => context.go('/login'),
+            icon: const Icon(Icons.login_rounded),
+            label: const Text('Giriş Sayfasına Dön'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
