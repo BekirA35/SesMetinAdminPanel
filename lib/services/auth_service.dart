@@ -28,8 +28,11 @@ class AuthService {
   // Logout (token ve login durumunu sil)
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
+    // Tüm auth verilerini temizle
     await prefs.remove(_tokenKey);
     await prefs.remove(_loggedInKey);
+    // SharedPreferences'ı commit et (cache sorunlarını önlemek için)
+    await prefs.reload();
   }
 
   // Token'ı temizle (sadece token'ı sil, login durumunu koruma)

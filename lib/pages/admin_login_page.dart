@@ -21,6 +21,19 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   String? _errorMessage;
 
   @override
+  void initState() {
+    super.initState();
+    // Login sayfası açıldığında eski token'ı temizle
+    // Böylece her zaman temiz bir login ekranı gösterilir
+    _clearOldToken();
+  }
+
+  Future<void> _clearOldToken() async {
+    // Eski token'ı temizle (cache sorunlarını önlemek için)
+    await AuthService.logout();
+  }
+
+  @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
