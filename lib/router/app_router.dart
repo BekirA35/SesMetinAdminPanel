@@ -6,56 +6,17 @@ import '../pages/dashboard_page.dart';
 import '../pages/users_page.dart';
 import '../pages/user_detail_page.dart';
 import '../pages/activities_page.dart';
-import '../pages/admin_login_page.dart';
-import '../services/auth_service.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/login',
-  redirect: (context, state) async {
-    final isLoginPage = state.uri.path == '/login';
-    
-    // Login sayfası değilse ve giriş yapılmamışsa, login'e yönlendir
-    if (!isLoginPage) {
-      // Web'de localStorage'ın yüklenmesi için kısa bir bekleme
-      await Future.delayed(const Duration(milliseconds: 50));
-      final isLoggedIn = await AuthService.isLoggedIn();
-      if (!isLoggedIn) {
-        return '/login';
-      }
-    }
-    
-    return null; // Yönlendirme yok
-  },
+  initialLocation: '/',
   routes: [
-    // Login sayfası (ShellRoute dışında)
-    GoRoute(
-      path: '/login',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const AdminLoginPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SafeFadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-      ),
-    ),
-    // Ana uygulama (ShellRoute içinde - login kontrolü yapılıyor)
+    // Ana uygulama (ShellRoute içinde)
     ShellRoute(
       builder: (context, state, child) {
         return AppShell(
           currentPath: state.uri.path,
           child: child,
         );
-      },
-      redirect: (context, state) async {
-        // ShellRoute içindeki tüm sayfalar için login kontrolü
-        final isLoggedIn = await AuthService.isLoggedIn();
-        if (!isLoggedIn) {
-          return '/login';
-        }
-        return null;
       },
       routes: [
         GoRoute(
@@ -156,9 +117,9 @@ final GoRouter appRouter = GoRouter(
           ),
           const SizedBox(height: 32),
           ElevatedButton.icon(
-            onPressed: () => context.go('/login'),
-            icon: const Icon(Icons.login_rounded),
-            label: const Text('Giriş Sayfasına Dön'),
+            onPressed: () => context.go('/'),
+            icon: const Icon(Icons.home_rounded),
+            label: const Text('Ana Sayfaya Dön'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
