@@ -21,14 +21,16 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   void initState() {
     super.initState();
-    // Login sayfası açıldığında eski token'ı temizle
-    // Böylece her zaman temiz bir login ekranı gösterilir
-    _clearOldToken();
+    // Web'de login sayfası açıldığında token kontrolü yap
+    _checkLoginStatus();
   }
 
-  Future<void> _clearOldToken() async {
-    // Eski token'ı temizle (cache sorunlarını önlemek için)
-    await AuthService.logout();
+  Future<void> _checkLoginStatus() async {
+    // Eğer zaten giriş yapılmışsa dashboard'a yönlendir
+    final isLoggedIn = await AuthService.isLoggedIn();
+    if (isLoggedIn && mounted) {
+      context.go('/');
+    }
   }
 
   @override
@@ -60,10 +62,32 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
     if (username == 'admin' && password == 'admin123') {
       // Fake token kaydet
-      await AuthService.saveToken('hardcoded_token_${DateTime.now().millisecondsSinceEpoch}');
+      final token = 'hardcoded_token_${DateTime.now().millisecondsSinceEpoch}';
+      await AuthService.saveToken(token);
+      
+      // Web'de localStorage'a yazılması için bekleme ve doğrulama
+      bool tokenSaved = false;
+      for (int i = 0; i < 10; i++) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        final savedToken = await AuthService.getToken();
+        if (savedToken != null && savedToken.isNotEmpty) {
+          tokenSaved = true;
+          break;
+        }
+      }
+      
+      if (!tokenSaved) {
+        setState(() {
+          _errorMessage = 'Giriş hatası: Token kaydedilemedi';
+          _isLoading = false;
+        });
+        return;
+      }
       
       // Dashboard'a yönlendir
-      context.go('/');
+      if (mounted) {
+        context.go('/');
+      }
     } else {
       setState(() {
         _errorMessage = 'Kullanıcı adı veya şifre hatalı';

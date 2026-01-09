@@ -9,6 +9,8 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
     await prefs.setBool(_loggedInKey, true);
+    // Web'de localStorage'a yazılmasını garanti etmek için commit et
+    await prefs.reload();
   }
 
   // Token alma

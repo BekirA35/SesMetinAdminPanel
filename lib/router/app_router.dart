@@ -14,17 +14,14 @@ final GoRouter appRouter = GoRouter(
   redirect: (context, state) async {
     final isLoginPage = state.uri.path == '/login';
     
-    // Login sayfasına gidiliyorsa, eski token'ı temizle
-    // Böylece her zaman temiz bir login ekranı gösterilir
-    if (isLoginPage) {
-      await AuthService.logout();
-      return null; // Login sayfasını göster
-    }
-    
     // Login sayfası değilse ve giriş yapılmamışsa, login'e yönlendir
-    final isLoggedIn = await AuthService.isLoggedIn();
-    if (!isLoggedIn) {
-      return '/login';
+    if (!isLoginPage) {
+      // Web'de localStorage'ın yüklenmesi için kısa bir bekleme
+      await Future.delayed(const Duration(milliseconds: 50));
+      final isLoggedIn = await AuthService.isLoggedIn();
+      if (!isLoggedIn) {
+        return '/login';
+      }
     }
     
     return null; // Yönlendirme yok
