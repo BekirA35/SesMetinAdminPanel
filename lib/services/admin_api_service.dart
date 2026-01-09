@@ -33,27 +33,43 @@ class AdminApiService {
   // Admin Login
   Future<AdminLoginResponse> adminLogin(String username, String password) async {
     try {
+      final requestBody = AdminLoginRequest(
+        username: username,
+        password: password,
+      ).toJson();
+      
+      // Debug: Request body'yi logla
+      print('Login Request URL: $baseUrl/api/Admin/login');
+      print('Login Request Body: ${jsonEncode(requestBody)}');
+      print('Login Username: $username');
+      print('Login Password Length: ${password.length}');
+      
       final response = await http.post(
         Uri.parse('$baseUrl/api/Admin/login'),
         headers: {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true',
         },
-        body: jsonEncode(AdminLoginRequest(
-          username: username,
-          password: password,
-        ).toJson()),
+        body: jsonEncode(requestBody),
       ).timeout(const Duration(seconds: 10));
 
+      // Debug: Response'u logla
+      print('Login Response Status: ${response.statusCode}');
+      print('Login Response Headers: ${response.headers}');
+      print('Login Response Body: ${response.body}');
+
+      final responseBody = jsonDecode(response.body);
+      
       if (response.statusCode == 200) {
-        return AdminLoginResponse.fromJson(jsonDecode(response.body));
+        return AdminLoginResponse.fromJson(responseBody);
       } else if (response.statusCode == 401 || response.statusCode == 400) {
-        final error = AdminLoginResponse.fromJson(jsonDecode(response.body));
+        final error = AdminLoginResponse.fromJson(responseBody);
         return error;
       } else {
         throw Exception('API Hatası: ${response.statusCode}');
       }
     } catch (e) {
+      print('Login Error: $e');
       throw Exception('Bağlantı hatası: $e');
     }
   }

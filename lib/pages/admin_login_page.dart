@@ -52,30 +52,23 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       _errorMessage = null;
     });
 
-    try {
-      final response = await _apiService.adminLogin(
-        _usernameController.text.trim(),
-        _passwordController.text,
-      );
+    // Hardcoded login kontrolü
+    await Future.delayed(const Duration(milliseconds: 500)); // Loading efekti için
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      if (response.success && response.token != null) {
-        // Token'ı kaydet
-        await AuthService.saveToken(response.token!);
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
 
-        // Dashboard'a yönlendir
-        context.go('/');
-      } else {
-        setState(() {
-          _errorMessage = response.message;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (!mounted) return;
+    if (username == 'admin' && password == 'admin123') {
+      // Fake token kaydet
+      await AuthService.saveToken('hardcoded_token_${DateTime.now().millisecondsSinceEpoch}');
+      
+      // Dashboard'a yönlendir
+      context.go('/');
+    } else {
       setState(() {
-        _errorMessage = 'Bağlantı hatası: ${e.toString().replaceAll('Exception: ', '')}';
+        _errorMessage = 'Kullanıcı adı veya şifre hatalı';
         _isLoading = false;
       });
     }
