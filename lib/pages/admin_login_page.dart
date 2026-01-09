@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../services/admin_api_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
@@ -15,7 +14,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _apiService = AdminApiService();
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
